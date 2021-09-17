@@ -10,7 +10,7 @@ module "lambda_function" {
   source_path = "../src/createSqsAndS3Folder/create_sqs"
 
   layers = [
-    module.lambda_layer_local.arn
+    module.lambda_layer_local.lambda_layer_arn
   ]
 
   tags = {

@@ -11,6 +11,17 @@
 #   ]
 # }
 
+data "aws_iam_policy_document" "lambda_create_sqs" {
+  statement {
+    actions = ["CreateQueue", "ListQueues"]
+    resources = ["arn:aws:sqs:eu-west-3:*"]
+  }
+}
+
+resource "aws_iam_policy" "lambda_create_sqs" {
+  name   = "create sqs queue"
+  policy = data.aws_iam_policy_document.lambda_create_sqs.json
+}
 
 module "lambda_function" {
   source = "terraform-aws-modules/lambda/aws"
@@ -20,22 +31,8 @@ module "lambda_function" {
   handler            = "create_sqs.create_janus_queue_handler"
   runtime            = "python3.8"
   publish            = true
-  attach_policy_json = true
-  policy_json        = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "sqs:CreateQueue",
-                "sqs:ListQueues"
-            ],
-            "Resource": ["*"]
-        }
-    ]
-}
-EOF
+  attach_policy = true
+  policy        = aws_iam_policy.lambda_create_sqs.arn
 
   source_path = "${path.module}/lambda_sqs_s3_src/create_sqs.py"
 

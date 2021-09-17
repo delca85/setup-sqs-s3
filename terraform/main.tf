@@ -6,7 +6,7 @@ module "lambda_function" {
   handler       = "create_sqs.create_janus_queue_handler"
   runtime       = "python3.8"
 
-  source_path = "../src/create_sqs.py"
+  source_path = "../src/createSqsAndS3Folder/create_sqs.py"
 
   tags = {
     Name = "my-lambda1"

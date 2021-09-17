@@ -7,7 +7,7 @@ module "lambda_function" {
   runtime       = "python3.8"
   publish       = true
 
-  source_path = "../src/createSqsAndS3Folder/create_sqs"
+  source_path = "../../src/createSqsAndS3Folder/create_sqs"
 
   layers = [
     module.lambda_layer_local.lambda_layer_arn
@@ -26,5 +26,5 @@ module "lambda_layer_local" {
   description         = "Create S3 Folder and SQS as destination of S3 events function layer (deployed locally)"
   compatible_runtimes = ["python3.8"]
 
-  source_path = "../src/createSqsAndS3Folder"
+  source_path = "../../src/createSqsAndS3Folder"
 }

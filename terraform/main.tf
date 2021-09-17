@@ -21,7 +21,6 @@ module "lambda_function" {
   runtime            = "python3.8"
   publish            = true
   attach_policy_json = true
-  attach_policy_json = true
   policy_json        = <<EOF
 {
     "Version": "2012-10-17",

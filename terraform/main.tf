@@ -9,6 +9,6 @@ module "lambda_function" {
   source_path = "../src/createSqsAndS3Folder/create_sqs.py"
 
   tags = {
-    Name = "my-lambda1"
+    Name = "marvel-lambda"
   }
 }

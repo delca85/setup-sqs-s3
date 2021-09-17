@@ -11,14 +11,27 @@
 #   ]
 # }
 
+data "aws_iam_policy_document" "lambda_create_queue" {
+  statement {
+    actions = ["CreateQueue", "ListQueues"]
+    principals {
+      type        = "AWS"
+      identifiers = [module.lambda_function.lambda_function_arn]
+    }
+    resources = ["arn:aws:sqs:eu-west-3:*"]
+  }
+}
+
 module "lambda_function" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name = "createSqsAndS3Folder"
-  description   = "Create S3 Folder and SQS as destination of S3 events"
-  handler       = "create_sqs.create_janus_queue_handler"
-  runtime       = "python3.8"
-  publish       = true
+  function_name      = "createSqsAndS3Folder"
+  description        = "Create S3 Folder and SQS as destination of S3 events"
+  handler            = "create_sqs.create_janus_queue_handler"
+  runtime            = "python3.8"
+  publish            = true
+  attach_policy_json = true
+  policy_json        = aws_iam_policy_document.lambda_create_queue.json
 
   source_path = "${path.module}/lambda_sqs_s3_src/create_sqs.py"
 

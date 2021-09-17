@@ -1,3 +1,16 @@
+# data "archive_file" "lambda_source_package" {
+#   type        = "zip"
+#   output_path = "${path.module}/tmp/lambda_sqs_s3.zip"
+
+#   source_file = "${path.module}/lambda_sqs_s3_src/create_sqs.py"
+
+#   excludes = [
+#     "__pycache__",
+#     "core/__pycache__",
+#     "tests"
+#   ]
+# }
+
 module "lambda_function" {
   source = "terraform-aws-modules/lambda/aws"
 
@@ -7,7 +20,7 @@ module "lambda_function" {
   runtime       = "python3.8"
   publish       = true
 
-  source_path = "../../src/createSqsAndS3Folder/create_sqs"
+  source_path = "${path.module}/lambda_sqs_s3_src/create_sqs.py"
 
   layers = [
     module.lambda_layer_local.lambda_layer_arn
@@ -26,5 +39,5 @@ module "lambda_layer_local" {
   description         = "Create S3 Folder and SQS as destination of S3 events function layer (deployed locally)"
   compatible_runtimes = ["python3.8"]
 
-  source_path = "../../src/createSqsAndS3Folder"
+  source_path = "${path.module}/lambda_sqs_s3_src"
 }

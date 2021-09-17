@@ -30,9 +30,7 @@ def create_janus_queue_handler(event=None, context=None):
         {
             "environment": "thor",
             "service": "edward-test",
-            "branch_name": "branch-name",
-            "force_subscribe_master": false,
-            "raw_message_delivery": false
+            "branch_name": "branch-name"
         }
 
     Returns
@@ -86,7 +84,7 @@ def get_policy(queue_name, environment_prefix):
 
 
 def create_janus_queue(
-    environment, service_name, branch_name, force_subscribe_master, raw_message_delivery
+    environment, service_name, branch_name
 ):
     environment_prefix = environment_map[environment]["alias"]
     queue_name = get_queue_name(environment_prefix, service_name, branch_name)

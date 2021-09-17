@@ -31,7 +31,7 @@ module "lambda_function" {
   runtime            = "python3.8"
   publish            = true
   attach_policy_json = true
-  policy_json        = aws_iam_policy_document.lambda_create_queue.json
+  policy_json        = data.aws_iam_policy_document.lambda_create_queue.json
 
   source_path = "${path.module}/lambda_sqs_s3_src/create_sqs.py"
 

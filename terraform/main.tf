@@ -17,7 +17,7 @@ locals {
 data "aws_iam_policy_document" "lambda_create_sqs" {
   statement {
     actions   = ["sqs:CreateQueue", "sqs:ListQueues"]
-    resources = ["arn:aws:sqs:region:${local.account_id}:*"]
+    resources = ["*"]
   }
 }
 

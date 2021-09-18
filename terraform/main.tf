@@ -19,6 +19,18 @@ data "aws_iam_policy_document" "lambda_create_sqs" {
     actions   = ["sqs:CreateQueue", "sqs:ListQueues"]
     resources = ["*"]
   }
+  statement {
+    actions = [
+      "sqs:TagQueue",
+      "sqs:GetQueueUrl",
+      "sqs:AddPermission",
+      "sqs:UntagQueue",
+      "sqs:GetQueueAttributes",
+      "sqs:ListQueueTags",
+      "sqs:SetQueueAttributes"
+    ]
+    resources = ["arn:aws:sqs:eu-west-3:161959740628:*"]
+  }
 }
 
 resource "aws_iam_policy" "lambda_create_sqs" {

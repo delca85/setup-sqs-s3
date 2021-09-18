@@ -29,8 +29,8 @@ def create_janus_queue_handler(event=None, context=None):
     event : dict
         {
             "environment": "thor",
-            "service": "edward-test",
-            "branch_name": "branch-name"
+            "service": "bianca-test",
+            "branch_name": "branch-bianca"
         }
 
     Returns

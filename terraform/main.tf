@@ -1,3 +1,6 @@
+locals {
+  account_id = "161959740628"
+}
 # data "archive_file" "lambda_source_package" {
 #   type        = "zip"
 #   output_path = "${path.module}/tmp/lambda_sqs_s3.zip"
@@ -13,8 +16,8 @@
 
 data "aws_iam_policy_document" "lambda_create_sqs" {
   statement {
-    actions = ["sqs:CreateQueue", "sqs:ListQueues"]
-    resources = ["*"]
+    actions   = ["sqs:CreateQueue", "sqs:ListQueues"]
+    resources = ["arn:aws:sqs:region:${local.account_id}:*"]
   }
 }
 
@@ -26,11 +29,11 @@ resource "aws_iam_policy" "lambda_create_sqs" {
 module "lambda_function" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name      = "create-sqs-and-s3"
-  description        = "Create S3 Folder and SQS as destination of S3 events"
-  handler            = "create_sqs.create_janus_queue_handler"
-  runtime            = "python3.8"
-  publish            = true
+  function_name = "create-sqs-and-s3"
+  description   = "Create S3 Folder and SQS as destination of S3 events"
+  handler       = "create_sqs.create_janus_queue_handler"
+  runtime       = "python3.8"
+  publish       = true
   attach_policy = true
   policy        = aws_iam_policy.lambda_create_sqs.arn
 

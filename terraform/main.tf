@@ -19,14 +19,14 @@ data "aws_iam_policy_document" "lambda_create_sqs" {
 }
 
 resource "aws_iam_policy" "lambda_create_sqs" {
-  name   = "create sqs queue"
+  name   = "create-sqs-queue"
   policy = data.aws_iam_policy_document.lambda_create_sqs.json
 }
 
 module "lambda_function" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name      = "createSqsAndS3Folder"
+  function_name      = "create-sqs-and-s3"
   description        = "Create S3 Folder and SQS as destination of S3 events"
   handler            = "create_sqs.create_janus_queue_handler"
   runtime            = "python3.8"

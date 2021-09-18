@@ -13,8 +13,8 @@
 
 data "aws_iam_policy_document" "lambda_create_sqs" {
   statement {
-    actions = ["CreateQueue", "ListQueues"]
-    resources = ["arn:aws:sqs:eu-west-3:*"]
+    actions = ["sqs:CreateQueue", "sqs:ListQueues"]
+    resources = ["*"]
   }
 }
 

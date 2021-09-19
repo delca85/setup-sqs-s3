@@ -132,8 +132,7 @@ def create_folder_in_s3(
     response = {}
     
     logger.info(f"Creating folder {folder_name} in {S3_BUCKET_NAME} bucket")
-    folder = s3_client.put_object(Bucket=S3_BUCKET_NAME, Key=(folder_name + '/'))
-    folder.wait_until_exists()
+    s3_client.put_object(Bucket=S3_BUCKET_NAME, Key=(folder_name + '/'))
     response["key"] = f"{S3_BUCKET_NAME}/{folder_name}"
     response["status"] = "Created"
     return response

@@ -36,7 +36,14 @@ data "aws_iam_policy_document" "lambda_create_sqs" {
   statement {
     actions = [
       "s3:PutObject",
-      "s3:PutObjectAcl"
+      "s3:PutObjectAcl",
+      "s3:GetObject"
+    ]
+    resources = ["${local.s3_bucket}/*"]
+  }
+  statement {
+    actions = [
+      "s3:ListBucket"
     ]
     resources = [local.s3_bucket]
   }

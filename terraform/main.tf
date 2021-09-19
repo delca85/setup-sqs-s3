@@ -1,5 +1,6 @@
 locals {
   account_id = "161959740628"
+  s3_bucket  = "arn:aws:s3:::my-bucket-for-playing"
 }
 # data "archive_file" "lambda_source_package" {
 #   type        = "zip"
@@ -30,6 +31,14 @@ data "aws_iam_policy_document" "lambda_create_sqs" {
       "sqs:SetQueueAttributes"
     ]
     resources = ["arn:aws:sqs:eu-west-3:161959740628:*"]
+  }
+
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [local.s3_bucket]
   }
 }
 

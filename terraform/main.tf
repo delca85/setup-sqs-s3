@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "lambda_create_sqs_s3_put_get_notification" {
 }
 
 resource "aws_iam_policy" "lambda_create_sqs_s3_put_get_notification" {
-  name   = "create-sqs-queue"
+  name   = "create-sqs-queue-s3-folder-s3-get-notification"
   policy = data.aws_iam_policy_document.lambda_create_sqs_s3_put_get_notification.json
 }
 

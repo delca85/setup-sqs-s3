@@ -7,8 +7,12 @@ logger.setLevel(logging.INFO)
 pp = pprint.PrettyPrinter(indent=2)
 
 environment_map = {
-    "thor": {"alias": "t"},
-    "prod": {"alias": "p"},
+    "thor": {
+        "alias": "t"
+    },
+    "prod": {
+        "alias": "p"
+    },
 }
 
 sqs_client = boto3.client("sqs")
@@ -20,6 +24,7 @@ s3_client = boto3.client("s3")
 
 SQS_ARN_PREFIX = "arn:aws:sqs:eu-west-3:161959740628:"
 S3_BUCKET_NAME = "my-bucket-for-playing"
+
 
 def create_janus_queue_handler(event=None, context=None):
     """Creates janus queue in the proper environment based on json input.
@@ -44,17 +49,12 @@ def create_janus_queue_handler(event=None, context=None):
     branch_name = event["branch_name"]
     service_name = event["service"]
 
-    sqs_response = create_janus_queue(
-        environment,
-        service_name,
-        branch_name
-    )
+    sqs_response = create_janus_queue(environment, service_name, branch_name)
 
-    s3_response = create_folder_in_s3(
-        environment,
-        service_name,
-        branch_name
-    )
+    s3_response = create_folder_in_s3(environment, service_name, branch_name)
+    set_bucket_folder_notification(s3_response['folder'],
+                                   sqs_response['sqs_arn'])
+
 
 def get_resource_name(environment_prefix, service_name, branch_name):
     """Returns the correct queue name"""
@@ -65,7 +65,8 @@ def get_resource_name(environment_prefix, service_name, branch_name):
 
     return queue_name
 
-def get_sqs_policy(queue_name, environment_prefix):
+
+def get_sqs_policy(queue_name):
 
     return """{
         "Version": "2012-10-17",
@@ -83,18 +84,13 @@ def get_sqs_policy(queue_name, environment_prefix):
                     }
                 }
             } ]
-    }""" % (
-        SQS_ARN_PREFIX,
-        queue_name,
-        S3_BUCKET_NAME
-    )
+    }""" % (SQS_ARN_PREFIX, queue_name, S3_BUCKET_NAME)
 
 
-def create_janus_queue(
-    environment, service_name, branch_name
-):
+def create_janus_queue(environment, service_name, branch_name):
     environment_prefix = environment_map[environment]["alias"]
-    queue_name = get_resource_name(environment_prefix, service_name, branch_name)
+    queue_name = get_resource_name(environment_prefix, service_name,
+                                   branch_name)
     response = {}
     tags = {
         "Environment": environment,
@@ -110,9 +106,9 @@ def create_janus_queue(
     logger.info(f"Creating queue {queue_name}, tags={tags}.")
 
     # Create queue
-    queue = sqs_resources.create_queue(
-        QueueName=queue_name, Attributes={"Policy": queue_policy}, tags=tags
-    )
+    queue = sqs_resources.create_queue(QueueName=queue_name,
+                                       Attributes={"Policy": queue_policy},
+                                       tags=tags)
 
     sqs_url = queue.url
     sqs_arn = queue.attributes.get("QueueArn")
@@ -122,17 +118,35 @@ def create_janus_queue(
     response["status"] = "Created"
     return response
 
-def create_folder_in_s3(
-        environment,
-        service_name,
-        branch_name
-):
+
+def create_folder_in_s3(environment, service_name, branch_name):
     environment_prefix = environment_map[environment]["alias"]
-    folder_name = get_resource_name(environment_prefix, service_name, branch_name)
+    folder_name = get_resource_name(environment_prefix, service_name,
+                                    branch_name)
     response = {}
-    
+
     logger.info(f"Creating folder {folder_name} in {S3_BUCKET_NAME} bucket")
     s3_client.put_object(Bucket=S3_BUCKET_NAME, Key=(folder_name + '/'))
-    response["key"] = f"{S3_BUCKET_NAME}/{folder_name}"
+    response["folder"] = folder_name
     response["status"] = "Created"
+    return response
+
+
+def set_bucket_folder_notification(folder, sqs_arn):
+    bucket_notification = s3_client.BucketNotification(S3_BUCKET_NAME)
+    response = bucket_notification.put(
+        NotificationConfiguration={
+            'QueueConfigurations': {
+                'QueueArn': sqs_arn,
+                'Events': ['s3:ObjectCreated:*'],
+                'Filter': {
+                    'Key': {
+                        'FilterRules': [{
+                            'Name': 'prefix',
+                            'Value': folder
+                        }]
+                    }
+                }
+            }
+        })
     return response

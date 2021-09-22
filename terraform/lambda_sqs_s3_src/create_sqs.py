@@ -73,14 +73,14 @@ def get_sqs_policy(queue_name):
         "Statement": [ {
             "Effect": "Allow",
             "Principal": "*",
-            "Action": "SQS:SendMessage",
+            "Action": "sqs:SendMessage",
             "Resource": "%s%s",
             "Condition":
                 {
                 "ArnEquals":
                     {
                     "aws:SourceArn":
-                        "%s"
+                        "arn:aws:s3:::%s"
                     }
                 }
             } ]
@@ -133,21 +133,21 @@ def create_folder_in_s3(environment, service_name, branch_name):
 
 
 def set_bucket_folder_notification(folder, sqs_arn):
-    bucket_notification = s3_client.get_bucket_notification_configuration(
-        Bucket=S3_BUCKET_NAME)
-    response = bucket_notification.put(
-        NotificationConfiguration={
-            'QueueConfigurations': {
-                'QueueArn': sqs_arn,
-                'Events': ['s3:ObjectCreated:*'],
-                'Filter': {
-                    'Key': {
-                        'FilterRules': [{
-                            'Name': 'prefix',
-                            'Value': folder
-                        }]
-                    }
+    configuration = {
+        'QueueConfigurations': {
+            'Id': 'Notify-ObjectCreated-To-Queue',
+            'QueueArn': sqs_arn,
+            'Events': ['s3:ObjectCreated:*'],
+            'Filter': {
+                'Key': {
+                    'FilterRules': [{
+                        'Name': 'prefix',
+                        'Value': f"{folder}/"
+                    }]
                 }
             }
-        })
+        }
+    }
+    response = s3_client.put_bucket_notification_configuration(
+        Bucket=S3_BUCKET_NAME, NotificationConfiguration=configuration)
     return response

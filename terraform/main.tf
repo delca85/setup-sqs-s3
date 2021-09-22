@@ -44,7 +44,8 @@ data "aws_iam_policy_document" "lambda_create_sqs_s3_put_get_notification" {
   statement {
     actions = [
       "s3:ListBucket",
-      "s3:GetBucketNotification"
+      "s3:GetBucketNotification",
+      "s3:PutBucketNotification"
     ]
     resources = [local.s3_bucket]
   }

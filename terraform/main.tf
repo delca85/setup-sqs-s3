@@ -15,7 +15,7 @@ locals {
 #   ]
 # }
 
-data "aws_iam_policy_document" "lambda_create_sqs" {
+data "aws_iam_policy_document" "lambda_create_sqs_s3_put_get_notification" {
   statement {
     actions   = ["sqs:CreateQueue", "sqs:ListQueues"]
     resources = ["*"]
@@ -37,21 +37,22 @@ data "aws_iam_policy_document" "lambda_create_sqs" {
     actions = [
       "s3:PutObject",
       "s3:PutObjectAcl",
-      "s3:GetObject"
+      "s3:GetObject",
     ]
     resources = ["${local.s3_bucket}/*"]
   }
   statement {
     actions = [
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetBucketNotification"
     ]
     resources = [local.s3_bucket]
   }
 }
 
-resource "aws_iam_policy" "lambda_create_sqs" {
+resource "aws_iam_policy" "lambda_create_sqs_s3_put_get_notification" {
   name   = "create-sqs-queue"
-  policy = data.aws_iam_policy_document.lambda_create_sqs.json
+  policy = data.aws_iam_policy_document.lambda_create_sqs_s3_put_get_notification.json
 }
 
 module "lambda_function" {
@@ -63,7 +64,7 @@ module "lambda_function" {
   runtime       = "python3.8"
   publish       = true
   attach_policy = true
-  policy        = aws_iam_policy.lambda_create_sqs.arn
+  policy        = aws_iam_policy.lambda_create_sqs_s3_put_get_notification.arn
 
   source_path = "${path.module}/lambda_sqs_s3_src/create_sqs.py"
 

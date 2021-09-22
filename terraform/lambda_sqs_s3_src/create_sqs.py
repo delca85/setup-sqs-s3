@@ -101,7 +101,7 @@ def create_janus_queue(environment, service_name, branch_name):
         # "Tribe": get_service_tribe_mapping(service_name),
     }
 
-    queue_policy = get_sqs_policy(queue_name, environment_prefix)
+    queue_policy = get_sqs_policy(queue_name)
 
     logger.info(f"Creating queue {queue_name}, tags={tags}.")
 
@@ -133,7 +133,8 @@ def create_folder_in_s3(environment, service_name, branch_name):
 
 
 def set_bucket_folder_notification(folder, sqs_arn):
-    bucket_notification = s3_client.BucketNotification(S3_BUCKET_NAME)
+    bucket_notification = s3_client.get_bucket_notification_configuration(
+        Bucket=S3_BUCKET_NAME)
     response = bucket_notification.put(
         NotificationConfiguration={
             'QueueConfigurations': {

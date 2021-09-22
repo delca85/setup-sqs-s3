@@ -134,10 +134,12 @@ def create_folder_in_s3(environment, service_name, branch_name):
 
 def set_bucket_folder_notification(folder, sqs_arn):
     configuration = {
-        'QueueConfigurations': {
+        'QueueConfigurations': [{
             'Id': 'Notify-ObjectCreated-To-Queue',
             'QueueArn': sqs_arn,
-            'Events': ['s3:ObjectCreated:*'],
+            'Events': [
+                's3:ObjectCreated:*',
+            ],
             'Filter': {
                 'Key': {
                     'FilterRules': [{
@@ -146,7 +148,7 @@ def set_bucket_folder_notification(folder, sqs_arn):
                     }]
                 }
             }
-        }
+        }]
     }
     response = s3_client.put_bucket_notification_configuration(
         Bucket=S3_BUCKET_NAME, NotificationConfiguration=configuration)
